@@ -1,0 +1,9 @@
+{{- $ctx := dict "root" . "component" "backend" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "webapp.fullname" $ctx }}
+  labels:
+    {{- include "webapp.labels" $ctx | nindent 4 }}
+data:
+  APP_MESSAGE: {{ .Values.backend.config.message | quote }}
