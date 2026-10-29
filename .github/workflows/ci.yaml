@@ -38,6 +38,8 @@ jobs:
 
   manifests:
     runs-on: ubuntu-24.04
+    env:
+      CRD_SCHEMAS: "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
     steps:
       - uses: actions/checkout@v7
       - name: Install kubeconform
@@ -47,4 +49,7 @@ jobs:
       - name: Validate chart
         run: helm template webapp helm/webapp -n webapp | "$RUNNER_TEMP/kubeconform" -strict -summary
       - name: Validate cluster resources
-        run: kubectl kustomize cluster | "$RUNNER_TEMP/kubeconform" -strict -summary
+        run: kubectl kustomize cluster | "$RUNNER_TEMP/kubeconform" -strict -summary -schema-location default -schema-location "$CRD_SCHEMAS"
+      - name: Validate Argo CD applications
+        run: |
+          "$RUNNER_TEMP/kubeconform" -strict -summary -schema-location default -schema-location "$CRD_SCHEMAS" gitops/root.yaml gitops/apps
