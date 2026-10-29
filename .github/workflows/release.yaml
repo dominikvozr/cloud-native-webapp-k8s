@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  IMAGE_PREFIX: ghcr.io/${{ github.repository }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      components: ${{ steps.detect.outputs.components }}
+      tag: ${{ steps.detect.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: detect
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          components=()
+          for c in backend frontend; do
+            if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] || ! git diff --quiet "$BEFORE" "$GITHUB_SHA" -- "app/$c"; then
+              components+=("$c")
+            fi
+          done
+          echo "components=$(jq -nc '$ARGS.positional' --args "${components[@]}")" >> "$GITHUB_OUTPUT"
+          echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: changes
+    if: needs.changes.outputs.components != '[]'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    env:
+      TAG: ${{ needs.changes.outputs.tag }}
+      COMPONENTS: ${{ needs.changes.outputs.components }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up arm64 emulation and builder
+        run: |
+          docker run --privileged --rm tonistiigi/binfmt:qemu-v10.2.3 --install arm64
+          docker buildx create --use
+      - name: Log in to GHCR
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$REGISTRY_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+      - name: Build and push images
+        run: |
+          for c in $(jq -r '.[]' <<< "$COMPONENTS"); do
+            docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              --label "org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+              -t "$IMAGE_PREFIX/$c:$TAG" \
+              --push \
+              "app/$c"
+          done
+
+  update-chart:
+    needs: [changes, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      TAG: ${{ needs.changes.outputs.tag }}
+      COMPONENTS: ${{ needs.changes.outputs.components }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Update image tags and chart version
+        run: |
+          for c in $(jq -r '.[]' <<< "$COMPONENTS"); do
+            C=$c yq -i '.[strenv(C)].image.tag = strenv(TAG)' helm/webapp/values.yaml
+          done
+          version=$(yq '.version' helm/webapp/Chart.yaml)
+          NEXT="${version%.*}.$(( ${version##*.} + 1 ))" yq -i '.version = strenv(NEXT)' helm/webapp/Chart.yaml
+      - name: Open pull request
+        run: |
+          branch="release/$TAG"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -am "chore(release): update images to $TAG"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "chore(release): update images to $TAG" \
+            --body "Image tags and chart version updated after the build of $GITHUB_SHA."
