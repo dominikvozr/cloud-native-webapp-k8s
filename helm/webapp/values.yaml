@@ -3,6 +3,11 @@ ingress:
   className: nginx
   host: webapp.local
 
+networkPolicy:
+  enabled: true
+  ingressNamespace: ingress-nginx
+  monitoringNamespace: monitoring
+
 backend:
   image:
     repository: ghcr.io/dominikvozr/cloud-native-webapp-k8s/backend
