@@ -1,0 +1,66 @@
+{{- $ctx := dict "root" . "component" "frontend" -}}
+{{- $v := .Values.frontend -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webapp.fullname" $ctx }}
+  labels:
+    {{- include "webapp.labels" $ctx | nindent 4 }}
+spec:
+  {{- if not $v.autoscaling.enabled }}
+  replicas: {{ $v.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "webapp.selectorLabels" $ctx | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "webapp.labels" $ctx | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "webapp.fullname" $ctx }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          image: {{ include "webapp.image" $ctx }}
+          imagePullPolicy: {{ $v.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 5
+          resources:
+            {{- toYaml $v.resources | nindent 12 }}
+          securityContext:
+            {{- include "webapp.containerSecurityContext" $ctx | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        # nginx writes its pid and temp files here, root filesystem is read-only
+        - name: tmp
+          emptyDir: {}

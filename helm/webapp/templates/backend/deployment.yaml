@@ -1,0 +1,74 @@
+{{- $ctx := dict "root" . "component" "backend" -}}
+{{- $v := .Values.backend -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webapp.fullname" $ctx }}
+  labels:
+    {{- include "webapp.labels" $ctx | nindent 4 }}
+spec:
+  {{- if not $v.autoscaling.enabled }}
+  replicas: {{ $v.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "webapp.selectorLabels" $ctx | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "webapp.labels" $ctx | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/backend/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/backend/secret.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "webapp.fullname" $ctx }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: backend
+          image: {{ include "webapp.image" $ctx }}
+          imagePullPolicy: {{ $v.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: APP_VERSION
+              value: {{ $v.image.tag | default .Chart.AppVersion | quote }}
+            - name: ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "webapp.backendSecretName" . }}
+                  key: ADMIN_TOKEN
+          envFrom:
+            - configMapRef:
+                name: {{ include "webapp.fullname" $ctx }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 5
+          resources:
+            {{- toYaml $v.resources | nindent 12 }}
+          securityContext:
+            {{- include "webapp.containerSecurityContext" $ctx | nindent 12 }}

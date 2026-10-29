@@ -1,0 +1,14 @@
+{{- if .Values.frontend.pdb.enabled }}
+{{- $ctx := dict "root" . "component" "frontend" -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "webapp.fullname" $ctx }}
+  labels:
+    {{- include "webapp.labels" $ctx | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.frontend.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "webapp.selectorLabels" $ctx | nindent 6 }}
+{{- end }}
