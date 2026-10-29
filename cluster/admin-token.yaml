@@ -1,0 +1,12 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: webapp-admin-token
+  namespace: webapp
+spec:
+  encryptedData:
+    ADMIN_TOKEN: AgCBC+CelbTSH7R/8AIQE7ARt36GaVpZTzfbK+R5kyI+EUZmIA0MB+wQ2mFbC6lUfUQu9jW+qdPhy3EmDiHtBbniQ4bHRCS5M+pcme0d87uDIC6Sns/7HhqYyeXmjwi08AT2+xTveFd1rzyneYy1ACjE1NIlnyXNUgS/In0qmvBs/9ZcptqUUt2I6oPjQZcpWgibk2Lf/djhFyE3ETkCaGMGm33WJZcMj9QQWZ2Nb6RAQrnecdhGzMFLBf53VGLeYF2O/H29N37eOX9tTNuiiHIqt2jpjD/DOh0TvqpGvUvy49yjnm3p5smaVW9QG3tRvYHoB2BdYRmRTz6t2ZB1pdOP/7BAvo4DhZYmUVGCveffwmc0i8BoA6qVMiiWqVNpu6baaYAsKddgmHVyfaQ+KDGOg7H6X7l6Wa/yEhZHs4EkHI5IPYv4Bx3VJJFYORKrtMFfW3sT1xWP7wiiAbUPWjaZWVIb4GpLAWR6HHLsaiXQ4NjUdvYNIGWd3sp83xcGG8Jl1gAWzXv+vhWOT944K00CIS6TYaIXgB8eC1EcIxpUYMN7kvJE2s+wcBn9eVV6R+iIf9+KYY+tmnr/B4Bv0IHgewHgWhBAPoICSsyMggTX+Y3OF1ZWmu0/goUS3Y/9a5gphaG2TRjFYosuRhKk3XCjGiScPBBeY97ShUDGRnZpAXlcDtqHyRDra/cqRRnw7jm6b98Ipp8cqJNh/vRYliOIJvNIpYxW16WtGq3lt4GXwPktCd/aejQmhk2feira0R0=
+  template:
+    metadata:
+      name: webapp-admin-token
+      namespace: webapp
