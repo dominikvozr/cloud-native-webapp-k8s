@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: app/backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/backend/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  images:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        component: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Lint Dockerfile
+        run: docker run --rm -i hadolint/hadolint:v2.15.1 < app/${{ matrix.component }}/Dockerfile
+      - name: Build image
+        run: docker build -t ${{ matrix.component }}:ci app/${{ matrix.component }}
+
+  manifests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install kubeconform
+        run: curl -sSfL https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz | tar -xz -C "$RUNNER_TEMP" kubeconform
+      - name: Lint chart
+        run: helm lint helm/webapp --strict
+      - name: Validate chart
+        run: helm template webapp helm/webapp -n webapp | "$RUNNER_TEMP/kubeconform" -strict -summary
+      - name: Validate cluster resources
+        run: kubectl kustomize cluster | "$RUNNER_TEMP/kubeconform" -strict -summary
