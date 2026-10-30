@@ -2,8 +2,6 @@
 
 Cloud native production environment for a web application on Kubernetes – with scaling, security, GitOps deployment, CI/CD and monitoring.
 
-> Sections are filled in step by step according to the [issues](../../issues).
-
 ## Contents
 
 - [Architecture](#architecture)
@@ -12,57 +10,69 @@ Cloud native production environment for a web application on Kubernetes – with
 - [Installation](#installation)
 - [Usage and verification](#usage-and-verification)
 - [Design decisions and trade-offs](#design-decisions-and-trade-offs)
+- [What I would add for production](#what-i-would-add-for-production)
 - [Repository workflow](#repository-workflow)
 
 ## Architecture
 
-_TODO (#8) – diagram and component overview._
-
-| Area        | Technology                                       |
-|-------------|--------------------------------------------------|
-| Cluster     | minikube (Calico CNI)                            |
-| Application | Node.js (Express) backend, nginx frontend        |
-| Packaging   | Helm                                             |
-| Security    | RBAC, NetworkPolicy, Pod Security Admission      |
-| GitOps      | ArgoCD                                           |
-| CI/CD       | GitHub Actions, GHCR                             |
-| Monitoring  | kube-prometheus-stack (Prometheus, Alertmanager) |
+Diagram of the request flow and the delivery flow, and a table mapping each requirement of the assignment to the files that implement it.
 
 ## Repository structure
 
-Planned structure (directories are added with the individual issues):
-
-```
-.
-├── app/
-│   ├── backend/        # Node.js API + /metrics
-│   └── frontend/       # static frontend served by nginx
-├── helm/               # Helm chart(s) for the application
-├── gitops/             # ArgoCD Application manifests
-├── monitoring/         # ServiceMonitor, PrometheusRule, stack values
-├── .github/workflows/  # CI/CD pipeline
-└── README.md
-```
+Directory tree of the repository with one line describing each directory.
 
 ## Prerequisites
 
-_TODO – tool versions (minikube, kubectl, helm, docker)._
+Tools and versions needed to run the project and the CPU and memory the cluster needs.
 
 ## Installation
 
-_TODO._
+### 1. Cluster
+
+Commands to start minikube with Calico and enable the ingress and metrics-server addons.
+
+### 2. Argo CD
+
+Commands to install Argo CD and apply `gitops/root.yaml`, after which everything else is synced from Git.
+
+### 3. Admin token on a new cluster
+
+How to provide the admin token when the committed SealedSecret cannot be decrypted on a new cluster.
+
+### 4. Access
+
+How to reach the application, Argo CD, Prometheus and Alertmanager through port-forwards.
 
 ## Usage and verification
 
-_TODO._
+### Application
+
+How to call the API and what the response shows.
+
+### GitOps
+
+How a change merged to `main` gets deployed and how manual changes in the cluster are reverted.
+
+### CI/CD
+
+What runs on a pull request, what runs after a merge to `main` and which repository settings are required.
+
+### Security checks
+
+Commands that show the network policies, Pod Security Admission and RBAC in action.
+
+### Alerts
+
+The list of alerts and how to trigger the 5xx alert with the admin endpoint.
 
 ## Design decisions and trade-offs
 
-_TODO._
+The main decisions, why they were made and what they cost.
+
+## What I would add for production
+
+What is missing for a real production environment and how I would add it.
 
 ## Repository workflow
 
-- Every task has a **GitHub issue**; work happens on a dedicated branch `<type>/<issue>-<description>`, e.g. `feat/3-helm-chart`.
-- Commits follow [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): description (#issue)`, e.g. `feat(helm): add backend deployment (#3)`.
-  - types: `feat`, `fix`, `docs`, `ci`, `chore`, `refactor`, `test`
-- Changes reach `main` only through a **Pull Request** (squash merge); the PR closes its issue via `Closes #N`.
+How issues, branches, commits and pull requests are used in this repository.
