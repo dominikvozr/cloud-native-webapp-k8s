@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="500" viewBox="0 0 880 500" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect id="background" width="880" height="500" fill="#ffffff"/>
+
+  <g id="namespace-monitoring">
+    <rect x="40" y="120" width="280" height="240" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="6 4"/>
+    <text x="56" y="144" font-size="12" fill="#64748b">namespace monitoring</text>
+  </g>
+
+  <g id="namespace-webapp">
+    <rect x="360" y="300" width="480" height="160" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="6 4"/>
+    <text x="824" y="324" font-size="12" text-anchor="end" fill="#64748b">namespace webapp</text>
+  </g>
+
+  <g id="browser">
+    <rect x="520" y="32" width="200" height="52" rx="26" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="620" y="63" font-size="14" text-anchor="middle" fill="#111827">Browser</text>
+  </g>
+
+  <g id="ingress-nginx">
+    <rect x="520" y="148" width="200" height="52" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="620" y="170" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">ingress-nginx</text>
+    <text x="620" y="189" font-size="12" text-anchor="middle" fill="#6b7280">namespace ingress-nginx</text>
+  </g>
+
+  <g id="prometheus">
+    <rect x="72" y="170" width="216" height="52" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="180" y="201" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">Prometheus</text>
+  </g>
+
+  <g id="alertmanager">
+    <rect x="72" y="270" width="216" height="52" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="180" y="301" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">Alertmanager</text>
+  </g>
+
+  <g id="backend">
+    <rect x="392" y="350" width="196" height="72" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="490" y="381" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">backend</text>
+    <text x="490" y="401" font-size="12" text-anchor="middle" fill="#6b7280">Node.js, 2-5 pods</text>
+  </g>
+
+  <g id="frontend">
+    <rect x="612" y="350" width="196" height="72" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="710" y="381" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">frontend</text>
+    <text x="710" y="401" font-size="12" text-anchor="middle" fill="#6b7280">nginx, 2-4 pods</text>
+  </g>
+
+  <g id="arrow-browser-ingress">
+    <path d="M620 84 V139" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M615 139 L625 139 L620 148 Z" fill="#374151"/>
+  </g>
+
+  <g id="arrow-ingress-backend">
+    <path d="M550 200 V341" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M545 341 L555 341 L550 350 Z" fill="#374151"/>
+    <text x="558" y="262" font-size="12" fill="#374151">/api</text>
+  </g>
+
+  <g id="arrow-ingress-frontend">
+    <path d="M690 200 V341" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M685 341 L695 341 L690 350 Z" fill="#374151"/>
+    <text x="698" y="262" font-size="12" fill="#374151">/</text>
+  </g>
+
+  <g id="arrow-prometheus-backend">
+    <path d="M288 196 H460 V341" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M455 341 L465 341 L460 350 Z" fill="#374151"/>
+    <text x="374" y="186" font-size="12" text-anchor="middle" fill="#374151">scrapes /metrics</text>
+  </g>
+
+  <g id="arrow-prometheus-alertmanager">
+    <path d="M180 222 V261" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M175 261 L185 261 L180 270 Z" fill="#374151"/>
+    <text x="188" y="250" font-size="12" fill="#374151">alerts</text>
+  </g>
+</svg>

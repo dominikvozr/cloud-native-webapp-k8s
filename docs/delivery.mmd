@@ -1,0 +1,7 @@
+flowchart LR
+  pr([Pull request]) --> ci["CI: tests, lint, validation"]
+  ci -- merge --> main[(main)]
+  main -- "app/ changed" --> release["Release: build images, push to GHCR"]
+  release -- "PR with new image tags" --> main
+  argo[Argo CD] -- polls --> main
+  argo -- applies --> cluster[Kubernetes]

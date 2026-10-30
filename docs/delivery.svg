@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1110" height="290" viewBox="0 0 1110 290" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect id="background" width="1110" height="290" fill="#ffffff"/>
+
+  <g id="pull-request">
+    <rect x="40" y="60" width="150" height="56" rx="28" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="115" y="93" font-size="14" text-anchor="middle" fill="#111827">Pull request</text>
+  </g>
+
+  <g id="ci">
+    <rect x="270" y="60" width="180" height="56" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="360" y="84" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">CI</text>
+    <text x="360" y="103" font-size="12" text-anchor="middle" fill="#6b7280">tests, lint, validation</text>
+  </g>
+
+  <g id="main">
+    <rect x="560" y="60" width="150" height="56" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="635" y="84" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">main</text>
+    <text x="635" y="103" font-size="12" text-anchor="middle" fill="#6b7280">Git repository</text>
+  </g>
+
+  <g id="release">
+    <rect x="870" y="60" width="200" height="56" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="970" y="84" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">Release</text>
+    <text x="970" y="103" font-size="12" text-anchor="middle" fill="#6b7280">build images, push to GHCR</text>
+  </g>
+
+  <g id="argocd">
+    <rect x="560" y="200" width="150" height="56" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="635" y="233" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">Argo CD</text>
+  </g>
+
+  <g id="kubernetes">
+    <rect x="870" y="200" width="200" height="56" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <text x="970" y="224" font-size="14" font-weight="600" text-anchor="middle" fill="#111827">Kubernetes</text>
+    <text x="970" y="243" font-size="12" text-anchor="middle" fill="#6b7280">minikube</text>
+  </g>
+
+  <g id="arrow-pr-ci">
+    <path d="M190 88 H261" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M261 83 L261 93 L270 88 Z" fill="#374151"/>
+  </g>
+
+  <g id="arrow-ci-main">
+    <path d="M450 88 H551" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M551 83 L551 93 L560 88 Z" fill="#374151"/>
+    <text x="505" y="80" font-size="12" text-anchor="middle" fill="#374151">merge</text>
+  </g>
+
+  <g id="arrow-main-release">
+    <path d="M710 78 H861" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M861 73 L861 83 L870 78 Z" fill="#374151"/>
+    <text x="790" y="70" font-size="12" text-anchor="middle" fill="#374151">app/ changed</text>
+  </g>
+
+  <g id="arrow-release-main">
+    <path d="M870 98 H719" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M719 93 L719 103 L710 98 Z" fill="#374151"/>
+    <text x="790" y="118" font-size="12" text-anchor="middle" fill="#374151">PR with new image tags</text>
+  </g>
+
+  <g id="arrow-argocd-main">
+    <path d="M635 200 V125" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M630 125 L640 125 L635 116 Z" fill="#374151"/>
+    <text x="643" y="163" font-size="12" fill="#374151">polls</text>
+  </g>
+
+  <g id="arrow-argocd-kubernetes">
+    <path d="M710 228 H861" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <path d="M861 223 L861 233 L870 228 Z" fill="#374151"/>
+    <text x="790" y="220" font-size="12" text-anchor="middle" fill="#374151">applies</text>
+  </g>
+</svg>
