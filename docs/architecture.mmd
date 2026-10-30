@@ -1,0 +1,12 @@
+flowchart TB
+  user([Browser]) --> ingress[ingress-nginx]
+  subgraph webapp["namespace webapp"]
+    fe["frontend<br/>nginx, 2-4 pods"]
+    be["backend<br/>Node.js, 2-5 pods"]
+  end
+  ingress -- "/" --> fe
+  ingress -- "/api" --> be
+  subgraph monitoring["namespace monitoring"]
+    prom[Prometheus] -- alerts --> am[Alertmanager]
+  end
+  prom -- "scrapes /metrics" --> be
