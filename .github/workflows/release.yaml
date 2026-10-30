@@ -96,7 +96,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
           git commit -am "chore(release): update images to $TAG"
-          git push origin "$branch"
-          gh pr create --base main --head "$branch" \
-            --title "chore(release): update images to $TAG" \
-            --body "Image tags and chart version updated after the build of $GITHUB_SHA."
+          git push --force origin "$branch"
+          if ! gh pr view "$branch" > /dev/null 2>&1; then
+            gh pr create --base main --head "$branch" \
+              --title "chore(release): update images to $TAG" \
+              --body "Image tags and chart version updated after the build of $GITHUB_SHA."
+          fi
