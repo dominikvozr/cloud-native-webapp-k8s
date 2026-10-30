@@ -47,7 +47,7 @@ jobs:
       - name: Lint chart
         run: helm lint helm/webapp --strict
       - name: Validate chart
-        run: helm template webapp helm/webapp -n webapp | "$RUNNER_TEMP/kubeconform" -strict -summary
+        run: helm template webapp helm/webapp -n webapp | "$RUNNER_TEMP/kubeconform" -strict -summary -schema-location default -schema-location "$CRD_SCHEMAS"
       - name: Validate cluster resources
         run: kubectl kustomize cluster | "$RUNNER_TEMP/kubeconform" -strict -summary -schema-location default -schema-location "$CRD_SCHEMAS"
       - name: Validate Argo CD applications
