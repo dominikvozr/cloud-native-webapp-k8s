@@ -1,0 +1,51 @@
+{{- if .Values.monitoring.enabled }}
+{{- $ctx := dict "root" . "component" "alerts" -}}
+{{- $ns := .Release.Namespace -}}
+{{- $backend := include "webapp.fullname" (dict "root" . "component" "backend") -}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "webapp.fullname" $ctx }}
+  labels:
+    {{- include "webapp.labels" $ctx | nindent 4 }}
+spec:
+  groups:
+    - name: {{ .Release.Name }}
+      rules:
+        - alert: WebappPodNotReady
+          expr: sum by (pod) (kube_pod_status_ready{namespace="{{ $ns }}", condition="false"}) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: {{`Pod {{ $labels.pod }} is not ready`}}
+            description: {{`Pod {{ $labels.pod }} has been failing its readiness probe for more than 5 minutes.`}}
+        - alert: WebappPodCrashLooping
+          expr: max_over_time(kube_pod_container_status_waiting_reason{namespace="{{ $ns }}", reason="CrashLoopBackOff"}[5m]) >= 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: {{`Container {{ $labels.container }} in pod {{ $labels.pod }} is crash looping`}}
+            description: {{`The container keeps restarting. Check its logs and the previous container state.`}}
+        - alert: WebappHighErrorRate
+          expr: |
+            sum(rate(http_requests_total{namespace="{{ $ns }}", job="{{ $backend }}", route=~"/api/.*", status=~"5.."}[5m]))
+              / sum(rate(http_requests_total{namespace="{{ $ns }}", job="{{ $backend }}", route=~"/api/.*"}[5m])) > 0.05
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: More than 5% of API requests fail with 5xx
+            description: {{`The 5xx error rate of the backend API is {{ $value | humanizePercentage }}.`}}
+        - alert: WebappHighCpuUsage
+          expr: |
+            sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="{{ $ns }}", container!=""}[5m]))
+              / sum by (pod) (kube_pod_container_resource_limits{namespace="{{ $ns }}", resource="cpu"}) > 0.8
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: {{`Pod {{ $labels.pod }} uses more than 80% of its CPU limit`}}
+            description: {{`CPU usage is at {{ $value | humanizePercentage }} of the limit, the container may be throttled.`}}
+{{- end }}

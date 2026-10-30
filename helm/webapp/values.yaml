@@ -6,6 +6,8 @@ networkPolicy:
   enabled: true
   ingressNamespace: ingress-nginx
   monitoringNamespace: monitoring
+monitoring:
+  enabled: true
 backend:
   image:
     repository: ghcr.io/dominikvozr/cloud-native-webapp-k8s/backend
