@@ -1,6 +1,6 @@
 # cloud-native-webapp-k8s
 
-Cloud native production environment for a web application on Kubernetes – with scaling, security, GitOps deployment, CI/CD and monitoring.
+Cloud native production environment for a web application on Kubernetes with scaling, security, GitOps deployment, CI/CD and monitoring.
 
 ## Architecture
 
